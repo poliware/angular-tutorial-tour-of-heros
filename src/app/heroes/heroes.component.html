@@ -1,0 +1,15 @@
+<h2>Meus Heróis</h2>
+
+
+<ul class="heroes">
+    <li *ngFor="let hero of heroes">
+        <a routerLink="/detail/{{hero.id}}">
+          <span class="badge">{{hero.id}}</span> {{hero.name}}
+        </a>
+        <button class="delete" title="delete hero"(click)="delete(hero)">x</button>
+    </li>
+</ul>
+
+<button mat-fab color ="primary" aria-label="Add new hero" [routerLink]="['/new']">
+	<mat-icon>add</mat-icon>
+</button>

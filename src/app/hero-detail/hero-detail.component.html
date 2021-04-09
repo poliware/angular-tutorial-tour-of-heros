@@ -1,0 +1,9 @@
+<div *ngIf="hero">
+    <h2>{{hero.name | uppercase}} Details</h2>
+    <div><span>Id: </span>{{hero.id}}</div><br>
+    <div><span>Description: </span>{{hero.description}}</div><br>
+    <div><span>Universe: </span>{{hero.universe}}</div><br>
+    <div><img style="max-width: 300px; object-fit: cover;" mat-card-image src="{{hero.imageUrl}}" alt="Image of {{hero.name}}"></div>
+    <button mat-raised-button (click)="goBack()">go back</button>
+    <button mat-raised-button [routerLink]="['/edit', hero.id]" color="primary">edit</button>
+</div>
