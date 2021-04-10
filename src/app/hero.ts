@@ -4,7 +4,7 @@ export enum HeroUniverse {
 }
   
 export interface Hero {
-    id: number;
+    id: string;
     name: string;
     imageUrl: string;
     universe: HeroUniverse;

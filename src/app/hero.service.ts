@@ -26,9 +26,9 @@ export class HeroService {
     private messageService: MessageService,
     ) { }
 
-  private log(message: string) {
-    this.messageService.add(`HeroService: ${message}`);
-  }
+  // private log(message: string) {
+  //   this.messageService.add(`HeroService: ${message}`);
+  // }
 
   //Essa é a URL da API
   private heroesUrl = 'https://api-default-309921.rj.r.appspot.com/';
@@ -38,14 +38,6 @@ export class HeroService {
   //   // this.messageService.add('HeroService: fetched heroes');
   //   return heroes;
   // }
-
-  getHeroes(): Observable<HeroGetReponse> {
-    return this.http.get<HeroGetReponse>(`${this.heroesUrl}/heroes`)
-    .pipe(
-      tap(_ => this.log('fetched heroes')),
-      catchError(this.handleError<HeroGetReponse>('getHeroes', {heroes: [], cursor: undefined}))
-    );
-  }
 
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
@@ -61,6 +53,25 @@ export class HeroService {
     };    
   }
 
+  getHeroes(): Observable<HeroGetReponse> {
+    return this.http.get<HeroGetReponse>(`${this.heroesUrl}/heroes`)
+    .pipe(
+      tap(_ => this.log('fetched heroes')),
+      catchError(this.handleError<HeroGetReponse>('getHeroes', {heroes: [], cursor: ""}))
+    );
+  }
+  getHeroNo404<Data>(id:string) : Observable<Hero>{
+    const url = `${this.heroesUrl}/hero/${id}`;
+    return this.http.get<Hero[]>(url).pipe(
+      map(heroes => heroes[0]),
+      tap(h => {
+        const outcome= h ? `fatched` : `did not find`;
+        this.log(`${outcome} hero id=${id}`);
+      }),
+      catchError(this.handleError<Hero>(`getHero id=${id}`))
+    );
+  }
+
   // getHero(id: number): Observable<Hero> {
     
   //   const hero = HEROES.find(h => h.id === id) as Hero;
@@ -68,8 +79,9 @@ export class HeroService {
   //   return of(hero);
   // }
 
-  getHero(id: number): Observable<Hero> {
-    const url = `${this.heroesUrl}/${id}`;
+  getHero(id: string): Observable<Hero> {
+    const url = `${this.heroesUrl}hero/${id}`;
+
     return this.http.get<Hero>(url).pipe(
       tap(_ => this.log(`fetched hero id=${id}`)),
       catchError(this.handleError<Hero>(`getHero id=${id}`))
@@ -77,21 +89,25 @@ export class HeroService {
   }
 
   updateHero(hero: Hero): Observable<any> {
-    return this.http.put(this.heroesUrl, hero, this.httpOptions).pipe(
+    const heroParams = {hero: hero};
+
+    return this.http.post(`${this.heroesUrl}/hero/${hero.id}`, heroParams, this.httpOptions).pipe(
       tap(_ => this.log(`updated hero id=${hero.id}`)),
       catchError(this.handleError<any>('updateHero'))
     );
   }
 
   addHero(hero: Hero): Observable<Hero> {
-    return this.http.post<Hero>(this.heroesUrl, hero, this.httpOptions).pipe(
+    const heroParams = {hero: hero};
+
+    return this.http.post<Hero>(`${this.heroesUrl}/heroes`, heroParams, this.httpOptions).pipe(
       tap((newHero: Hero) => this.log(`added hero w/ id=${newHero.id}`)),
       catchError(this.handleError<Hero>('addHero'))
     );
   }
 
-  deleteHero(id: number): Observable<Hero> {
-    const url = `${this.heroesUrl}/${id}`;
+  deleteHero(id: string): Observable<Hero> {
+    const url = `${this.heroesUrl}/hero/${id}`;
   
     return this.http.delete<Hero>(url, this.httpOptions).pipe(
       tap(_ => this.log(`deleted hero id=${id}`)),
@@ -110,6 +126,10 @@ export class HeroService {
          this.log(`no heroes matching "${term}"`)),
       catchError(this.handleError<Hero[]>('searchHeroes', []))
     );
+  }
+
+  private log(message: string){
+    this.messageService.add(`HeroService: ${message}`);
   }
 
 }
